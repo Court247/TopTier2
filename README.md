@@ -19,6 +19,8 @@
 
 ## Change Log
 
+### June 23, 2024
+
 1. Fixed the issue with unfavoriting a character unfavorites the character below it.
-2. Fixed the issue where you couldn't view the character page from the favorites list
-3. Fixed the issue where it wouldn't save the data in the database.
+3. Fixed the issue where you couldn't view the character page from the favorites list
+4. Fixed the issue where it wouldn't save the data in the database.
