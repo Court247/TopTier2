@@ -4,8 +4,8 @@
 
 ## Introduction
 
-    TopTier is an app that allows users to see tierlists from select people to know what gear for a specific game to use for their character, to let them know the tier of the character they have, and other various information for the character. The data used is received from various users from accross the internet. As of right now only data from "Epic7x" and "Gachax" is being used.
-	This app is never meant to go into production this is simply for practice of creating application, project management, dart and flutter languages. Dart is used for the backend and Flutter/Dart is used for the frontend.
+TopTier is an app that allows users to see tierlists from select people to know what gear for a specific game to use for their character, to let them know the tier of the character they have, and other various information for the character. The data used is received from various users from accross the internet. As of right now only data from "Epic7x" and "Gachax" is being used.
+This app is never meant to go into production this is simply for practice of creating application, project management, dart and flutter languages. Dart is used for the backend and Flutter/Dart is used for the frontend.
 
 ## Installation
 
