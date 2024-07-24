@@ -10,6 +10,7 @@ import 'package:toptier/charactertierlistpage.dart';
 import 'WebClient.dart';
 import 'GameInfo.dart';
 import 'favorites.dart';
+import 'package:uuid/uuid.dart';
 
 class TopTierGames extends StatelessWidget {
   const TopTierGames({super.key});
@@ -111,6 +112,7 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
     }
   }
 
+  //set the collection information for the characters
   setCollection(gameInfo) async {
     int i = 0;
 
@@ -118,8 +120,11 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
       bool exists = await searchCollection(
           gameInfo.characters[i]['name'], gameInfo.gameName);
 
+      //updateIDS(gameInfo);
+
       if (!exists) {
         db.collection(gameInfo.gameName).doc((i + 1).toString()).set({
+          'id': gameInfo.characters[i]['id'],
           'name': gameInfo.characters[i]['name'],
           'title': gameInfo.characters[i]['title'],
           'image': gameInfo.characters[i]['image'],
@@ -144,10 +149,16 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
 
         docRef.snapshots().listen((docSnapshot) {
           if (docSnapshot.exists) {
-            Map<String, dynamic> newData = docSnapshot.data();
+            Map<String, dynamic> newData =
+                docSnapshot.data() as Map<String, dynamic>;
 
-            if (oldData != null && !mapEquals(oldData, newData)) {
-              docRef.update(newData);
+            // Assuming you have a function to process newData and return updated data
+            Map<String, dynamic> processedData = processData(newData);
+
+            if (!mapEquals(oldData, processedData)) {
+              docRef.update(processedData);
+              oldData = Map<String, dynamic>.from(
+                  processedData); // Update oldData to reflect the latest state
             }
           }
         });
@@ -156,14 +167,29 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
     }
   }
 
-  searchCollection(name, gameName) async {
-    var querySnapshot =
-        await db.collection(gameName).where('name', isEqualTo: name).get();
+  // Example processData function that modifies newData
+  Map<String, dynamic> processData(Map<String, dynamic> data) {
+    // Modify data as needed
+    return data;
+  }
 
-    if (querySnapshot.docs.isNotEmpty) {
-      return true;
-    } else {
-      return false;
+  searchCollection(name, gameName) async {
+    try {
+      // Perform the query to find documents where 'name' matches the character's name
+      var querySnapshot =
+          await db.collection(gameName).where('name', isEqualTo: name).get();
+
+      // Check if the query returned any documents
+      if (querySnapshot.docs.isNotEmpty) {
+        // If documents are found, the name exists in the collection
+        return true;
+      } else {
+        // No documents found, the name does not exist in the collection
+        return false;
+      }
+    } catch (e) {
+      // Handle any errors that occur during the query
+      print("Error searching collection: $e");
     }
   }
 
@@ -173,6 +199,7 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
     final gameData = gameDoc.docs.map((doc) => doc.data()).toList();
     gameData
         .map((data) => gameInfo.add(GameInfo(
+            id: data['id'],
             name: data['name'],
             title: data['title'],
             image: data['image'],

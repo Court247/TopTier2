@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toptier/signin.dart';
-import 'package:toptier/userpreferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-import 'package:http/http.dart' as http;
 
 import 'favoritesprovider.dart';
-import 'gamelistpage.dart';
+import 'userpreferences.dart';
 
 main() async {
   //this is the firebase configuration
@@ -31,6 +30,8 @@ main() async {
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
   );
+  await UserPreferences().init();
+
   runApp(const TopTierHome());
 }
 
@@ -44,7 +45,6 @@ class TopTierHome extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
-        ChangeNotifierProvider(create: (context) => UserPreferences()),
         Provider<FirebaseAuth>(
           create: (context) => FirebaseAuth.instance,
         ),
@@ -53,6 +53,9 @@ class TopTierHome extends StatelessWidget {
         ),
         Provider<FirebaseStorage>(
           create: (context) => FirebaseStorage.instance,
+        ),
+        Provider<SharedPreferences>(
+          create: (context) => UserPreferences().instance,
         ),
       ],
       child: MaterialApp(

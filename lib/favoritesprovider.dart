@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:toptier/GameInfo.dart';
 
+import 'CharacterRemove.dart';
+
 class FavoriteProvider extends ChangeNotifier {
-  List<GameInfo> _favorites = [];
-  List<GameInfo> get favorites => _favorites;
+  List<CharacterRemove> _favorites = [];
+  List<CharacterRemove> get favorites => _favorites;
 
   /// Documentation for addFav
   /// > * _`@param: [GameInfo]`_ - character
@@ -12,14 +14,23 @@ class FavoriteProvider extends ChangeNotifier {
   ///
   /// adds character to favorites list
   /// Some reason it keeps removing the character below the one you click on
-  void addFav(GameInfo character) {
-    String charName = character.name;
-    final isFav = character.isFavorite;
-    if (isFav) {
+
+  void addFav(CharacterRemove character) {
+    //add to favorites list
+    if (character.character.isFavorite) {
+      print(character.creator);
       _favorites.add(character);
-    } else if (!isFav) {
-      _favorites.remove(character);
     }
+
+    // Notify listeners of the change
+    notifyListeners();
+  }
+
+  void removeFav(characterID) {
+    //fix this logic
+    // Find the character by ID
+    _favorites.removeWhere((find) => find.character.id == characterID);
+
     notifyListeners();
   }
 

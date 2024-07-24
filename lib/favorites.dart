@@ -1,8 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toptier/favoritesprovider.dart';
+
+import 'CharacterRemove.dart';
+import 'characterprofile.dart';
 
 ///Favorites page that shows the list of currently saved favorited characters.
 class Favorites extends StatelessWidget {
@@ -25,7 +30,13 @@ class Favorites extends StatelessWidget {
           },
         ),
         actions: <Widget>[
-          IconButton(onPressed: () {}, icon: const Icon(Icons.settings)),
+          IconButton(
+              onPressed: () {
+                // Navigator.push(context, MaterialPageRoute(builder: (context) {
+                //   return const Settings();
+                // }));
+              },
+              icon: const Icon(Icons.settings)),
         ],
       ),
       backgroundColor: Colors.pink.shade50,
@@ -50,13 +61,13 @@ class _FavoriteListState extends State<FavoriteList> {
   /// > _`@returns: [dynamic]`_
   ///
   /// changes the isFavorite and canAdd variables to default
-  changeChar() {
-    final provider = Provider.of<FavoriteProvider>(context, listen: false);
-    final favs = provider.favorites;
+  changeChar(List<CharacterRemove> favs) {
     int i = 0;
     while (i < favs.length) {
-      favs[i].isFavorite = false;
-      favs[i].canAdd = true;
+      print(favs[i].character.name);
+      favs[i].character.isFavorite = false;
+      favs[i].character.canAdd = true;
+      findDocID(favs[i].character.id, favs[i].gameName);
       i++;
     }
   }
@@ -86,10 +97,10 @@ class _FavoriteListState extends State<FavoriteList> {
                   ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
-                              MaterialStatePropertyAll(Colors.pink.shade100)),
+                              WidgetStatePropertyAll(Colors.pink.shade100)),
                       onPressed: () {
                         setState(() {
-                          changeChar();
+                          changeChar(provider.favorites);
                         });
                         provider.clearFavorite();
 
@@ -124,10 +135,10 @@ class _FavoriteListState extends State<FavoriteList> {
                   ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor:
-                              MaterialStatePropertyAll(Colors.pink.shade100)),
+                              WidgetStatePropertyAll(Colors.pink.shade100)),
                       onPressed: () {
                         setState(() {
-                          changeChar();
+                          changeChar(provider.favorites);
                         });
                         provider.clearFavorite();
 
@@ -147,10 +158,27 @@ class _FavoriteListState extends State<FavoriteList> {
     }
   }
 
+  findDocID(characterID, gameName) async {
+    final db = Provider.of<FirebaseFirestore>(context, listen: false);
+    var snapshot =
+        await db.collection(gameName).where('id', isEqualTo: characterID).get();
+
+    if (snapshot.docs.isNotEmpty) {
+      print(snapshot.docs.first.id);
+      db.collection(gameName).doc(snapshot.docs.first.id).update({
+        'isFavorite': false,
+        'canAdd': true,
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FavoriteProvider>(context);
     final favorites = provider.favorites;
+    final user = Provider.of<FirebaseAuth>(context, listen: false);
+    final db = Provider.of<FirebaseFirestore>(context, listen: false);
+    late CharacterRemove favsInfo;
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -173,15 +201,16 @@ class _FavoriteListState extends State<FavoriteList> {
             itemBuilder: (context, index) {
               final favs = favorites[index];
               return ListTile(
+                key: ValueKey<String?>(favs.character.id),
                 contentPadding: const EdgeInsets.all(5),
                 hoverColor: Colors.pink.shade50,
                 selectedTileColor: Colors.pink.shade50,
                 leading: Image.network(
-                  favs.image,
+                  favs.character.image,
                   fit: BoxFit.cover,
                 ),
                 title: Text(
-                  '${favs.name}',
+                  '${favs.character.name}',
                   style: TextStyle(
                       fontSize: 20,
                       fontFamily: 'Horizon',
@@ -195,17 +224,27 @@ class _FavoriteListState extends State<FavoriteList> {
                 trailing: FavoriteButton(
                   iconColor: Colors.pinkAccent.shade400,
                   iconSize: 35.5,
-                  isFavorite: favs.isFavorite,
+                  isFavorite: favs.character.isFavorite,
                   //make it so that "canAdd is changed "
-                  valueChanged: (fav) {
-                    favs.isFavorite = fav;
-                    // if (fav) {
-                    //   favs.canAdd = false;
-                    // }
-                    provider.addFav(favs);
+                  valueChanged: (favorite) {
+                    favs.character.isFavorite = favorite;
+                    favs.character.canAdd = !favorite;
+                    provider.removeFav(favs.character.id);
+                    findDocID(favs.character.id, favs.gameName);
                   },
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CharacterProfile(
+                        gameName: favs.gameName,
+                        creator: favs.creator,
+                        character: favs.character,
+                      ),
+                    ),
+                  );
+                },
               );
             },
           )),

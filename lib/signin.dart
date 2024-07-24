@@ -225,13 +225,13 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     ElevatedButton(
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateColor.resolveWith(
+                          backgroundColor: WidgetStateColor.resolveWith(
                               (states) =>
                                   const Color.fromARGB(255, 255, 74, 134)),
-                          textStyle: MaterialStateProperty.all(
+                          textStyle: WidgetStateProperty.all(
                               const TextStyle(fontSize: 20, inherit: true)),
                           fixedSize:
-                              MaterialStateProperty.all(const Size(100, 50))),
+                              WidgetStateProperty.all(const Size(100, 50))),
                       onPressed: () async {
                         if (submit() && await login.call() == true) {
                           if (mounted) {

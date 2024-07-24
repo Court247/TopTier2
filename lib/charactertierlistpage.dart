@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:favorite_button/favorite_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'GameInfo.dart';
 import 'characterprofile.dart';
 import 'favoritesprovider.dart';
+import 'CharacterRemove.dart';
 
 ///Widget that shows the list of CharacterTierList Tierlists
 class CharacterTierList extends StatelessWidget {
@@ -73,9 +75,11 @@ class CharacterTierListPage extends StatefulWidget {
 class _CharacterTierListPageState extends State<CharacterTierListPage> {
   String gameName;
   String creator;
+  var db;
   final List<GameInfo> gameInfo;
   late List<GameInfo> gInfo = gameInfo;
   final characterSearch = TextEditingController();
+  late CharacterRemove characterInfo;
 
   _CharacterTierListPageState({
     required this.gameName,
@@ -98,10 +102,11 @@ class _CharacterTierListPageState extends State<CharacterTierListPage> {
     setState(() => gInfo = suggestions);
   }
 
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<FavoriteProvider>(context, listen: true);
+    db = Provider.of<FirebaseFirestore>(context, listen: false);
+
     return Column(children: [
       SizedBox(
         height: 35,
@@ -126,6 +131,7 @@ class _CharacterTierListPageState extends State<CharacterTierListPage> {
         itemBuilder: (context, index) {
           final character = gInfo[index];
           return ListTile(
+            key: ValueKey<String?>(character.id),
             contentPadding: const EdgeInsets.all(5),
             hoverColor: Colors.pink.shade50,
             selectedTileColor: Colors.pink.shade50,
@@ -157,11 +163,24 @@ class _CharacterTierListPageState extends State<CharacterTierListPage> {
               iconColor: Colors.pinkAccent.shade400,
               iconSize: 35.5,
               isFavorite: character.isFavorite,
-              valueChanged: (fav) {
-                //Set character favorite to the value of fav
-                character.isFavorite = fav;
-                //Adds GameInfo character instance to fav list in provider
-                provider.addFav(character);
+              valueChanged: (favorite) {
+                character.isFavorite = favorite;
+                character.canAdd = !favorite;
+                characterInfo = CharacterRemove(
+                  gameName: gameName,
+                  creator: creator,
+                  character: character,
+                );
+                if (favorite) {
+                  provider.addFav(characterInfo);
+                } else {
+                  provider.removeFav(character.id);
+                }
+
+                db.collection(gameName).doc((index + 1).toString()).update({
+                  'isFavorite': character.isFavorite,
+                  'canAdd': character.canAdd,
+                });
               },
             ),
             onTap: () {
