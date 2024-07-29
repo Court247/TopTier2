@@ -19,8 +19,14 @@ This app is never meant to go into production this is simply for practice of cre
 
 ## Change Log
 
+### June 29, 2024
+
+1. Created Settings page
+2. User's favorites list can now be saved and uploaded and updates the main list so they don't add duplicates
+3. Users can now search favorites list
+
 ### June 23, 2024
 
 1. Fixed the issue with unfavoriting a character unfavorites the character below it.
-3. Fixed the issue where you couldn't view the character page from the favorites list
-4. Fixed the issue where it wouldn't save the data in the database.
+2. Fixed the issue where you couldn't view the character page from the favorites list
+3. Fixed the issue where it wouldn't save the data in the database.

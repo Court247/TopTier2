@@ -30,19 +30,11 @@ main() async {
     webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
     androidProvider: AndroidProvider.debug,
   );
-  await UserPreferences().init();
+  UserPreferences userPreferences = UserPreferences();
+  await userPreferences.init();
 
-  runApp(const TopTierHome());
-}
-
-/// Opening class that simply connects to the Home Page.
-class TopTierHome extends StatelessWidget {
-  const TopTierHome({super.key});
-  @override
-
-  /// This widget is the root of the application.
-  Widget build(BuildContext context) {
-    return MultiProvider(
+  runApp(
+    MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => FavoriteProvider()),
         Provider<FirebaseAuth>(
@@ -54,19 +46,30 @@ class TopTierHome extends StatelessWidget {
         Provider<FirebaseStorage>(
           create: (context) => FirebaseStorage.instance,
         ),
-        Provider<SharedPreferences>(
-          create: (context) => UserPreferences().instance,
+        Provider<UserPreferences>(
+          create: (context) => userPreferences,
         ),
       ],
-      child: MaterialApp(
-        title: 'TopTier Welcome',
-        theme: ThemeData(
-          brightness: Brightness.light,
-          primarySwatch: Colors.pink,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const TopTierHomePage(),
+      child: const TopTierHome(),
+    ),
+  );
+}
+
+/// Opening class that simply connects to the Home Page.
+class TopTierHome extends StatelessWidget {
+  const TopTierHome({super.key});
+  @override
+
+  /// This widget is the root of the application.
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'TopTier Welcome',
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.pink,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: const TopTierHomePage(),
     );
   }
 }

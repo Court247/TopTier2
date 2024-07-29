@@ -5,6 +5,7 @@ import 'CharacterRemove.dart';
 
 class FavoriteProvider extends ChangeNotifier {
   List<CharacterRemove> _favorites = [];
+  set favorites(List<CharacterRemove> value) => _favorites = value;
   List<CharacterRemove> get favorites => _favorites;
 
   /// Documentation for addFav
@@ -18,8 +19,17 @@ class FavoriteProvider extends ChangeNotifier {
   void addFav(CharacterRemove character) {
     //add to favorites list
     if (character.character.isFavorite) {
-      print(character.creator);
-      _favorites.add(character);
+      final userId =
+          character.character.id; // Assuming character has a userId property
+      final isUserInFavorites =
+          _favorites.any((fav) => fav.character.id == userId);
+
+      if (!isUserInFavorites) {
+        print(character.creator);
+        _favorites.add(character);
+      }
+
+      
     }
 
     // Notify listeners of the change

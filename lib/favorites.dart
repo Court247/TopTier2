@@ -5,13 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toptier/favoritesprovider.dart';
+import 'package:toptier/userpreferences.dart';
 
 import 'CharacterRemove.dart';
 import 'characterprofile.dart';
+import 'settingspage.dart';
 
 ///Favorites page that shows the list of currently saved favorited characters.
 class Favorites extends StatelessWidget {
-  const Favorites({super.key});
+  Favorites({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +36,18 @@ class Favorites extends StatelessWidget {
         actions: <Widget>[
           IconButton(
               onPressed: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) {
-                //   return const Settings();
-                // }));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ),
+                );
               },
               icon: const Icon(Icons.settings)),
         ],
       ),
       backgroundColor: Colors.pink.shade50,
-      body: const SafeArea(
+      body: SafeArea(
         child: FavoriteList(),
       ),
     ));
@@ -57,6 +64,41 @@ class FavoriteList extends StatefulWidget {
 }
 
 class _FavoriteListState extends State<FavoriteList> {
+  late final provider;
+  late final user;
+  late final sharedPrefs;
+  bool _isInitialized = false; // Define the flag here
+  final characterSearch = TextEditingController();
+  List<CharacterRemove> favorites =
+      []; // Assume this is populated with the favorites list
+  List<CharacterRemove> filteredFavorites = [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      provider = Provider.of<FavoriteProvider>(context);
+      user = Provider.of<FirebaseAuth>(context);
+      sharedPrefs = Provider.of<UserPreferences>(context);
+      favorites = provider.favorites;
+      filteredFavorites = favorites;
+      characterSearch.addListener(() {
+        searchFavCharacter(characterSearch.text);
+      });
+      _isInitialized = true;
+    }
+  }
+
+  void searchFavCharacter(String query) {
+    setState(() {
+      filteredFavorites = favorites
+          .where((character) => character.character.name
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    });
+  }
+
   /// Documentation for changeChar
   /// > _`@returns: [dynamic]`_
   ///
@@ -67,7 +109,6 @@ class _FavoriteListState extends State<FavoriteList> {
       print(favs[i].character.name);
       favs[i].character.isFavorite = false;
       favs[i].character.canAdd = true;
-      findDocID(favs[i].character.id, favs[i].gameName);
       i++;
     }
   }
@@ -77,8 +118,6 @@ class _FavoriteListState extends State<FavoriteList> {
   ///
   /// When pressed, it shows an Alert box asking user if they're sure they want to erase favorites list
   void confirmation() {
-    final provider = Provider.of<FavoriteProvider>(context, listen: false);
-
     if (provider.favorites.isEmpty) {
       showDialog(
           context: context,
@@ -99,11 +138,6 @@ class _FavoriteListState extends State<FavoriteList> {
                           backgroundColor:
                               WidgetStatePropertyAll(Colors.pink.shade100)),
                       onPressed: () {
-                        setState(() {
-                          changeChar(provider.favorites);
-                        });
-                        provider.clearFavorite();
-
                         Navigator.pop(context);
                       },
                       child: const Text('Ok')),
@@ -141,7 +175,8 @@ class _FavoriteListState extends State<FavoriteList> {
                           changeChar(provider.favorites);
                         });
                         provider.clearFavorite();
-
+                        sharedPrefs.clearPreferences(user.currentUser!.uid,
+                            'favorites'); // Assuming user has a uid property
                         Navigator.pop(context);
                       },
                       child: const Text('Yes')),
@@ -158,27 +193,13 @@ class _FavoriteListState extends State<FavoriteList> {
     }
   }
 
-  findDocID(characterID, gameName) async {
-    final db = Provider.of<FirebaseFirestore>(context, listen: false);
-    var snapshot =
-        await db.collection(gameName).where('id', isEqualTo: characterID).get();
-
-    if (snapshot.docs.isNotEmpty) {
-      print(snapshot.docs.first.id);
-      db.collection(gameName).doc(snapshot.docs.first.id).update({
-        'isFavorite': false,
-        'canAdd': true,
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FavoriteProvider>(context);
     final favorites = provider.favorites;
-    final user = Provider.of<FirebaseAuth>(context, listen: false);
-    final db = Provider.of<FirebaseFirestore>(context, listen: false);
-    late CharacterRemove favsInfo;
+
+    //run emulator to see if user prefs is set
+    //call user prefs from the provider in Characterlistpage and create a method that iterates through the list
+    //to then add it into the favorites list and make sure they chage the isFavorite, canAdd and then later "isowned"
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
@@ -191,15 +212,26 @@ class _FavoriteListState extends State<FavoriteList> {
       ),
       body: Column(
         children: [
+          SizedBox(
+            height: 35,
+            child: TextField(
+              controller: characterSearch,
+              decoration: InputDecoration(
+                  hintText: 'Search name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: const BorderSide(color: Colors.pink))),
+            ),
+          ),
           Expanded(
               child: ListView.builder(
             primary: true,
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             padding: const EdgeInsets.all(5),
-            itemCount: favorites.length,
+            itemCount: filteredFavorites.length,
             itemBuilder: (context, index) {
-              final favs = favorites[index];
+              final favs = filteredFavorites[index];
               return ListTile(
                 key: ValueKey<String?>(favs.character.id),
                 contentPadding: const EdgeInsets.all(5),
@@ -230,7 +262,8 @@ class _FavoriteListState extends State<FavoriteList> {
                     favs.character.isFavorite = favorite;
                     favs.character.canAdd = !favorite;
                     provider.removeFav(favs.character.id);
-                    findDocID(favs.character.id, favs.gameName);
+                    sharedPrefs.saveUserFavorites(
+                        user.currentUser!.uid, 'favorites', favorites);
                   },
                 ),
                 onTap: () {

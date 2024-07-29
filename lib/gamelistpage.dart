@@ -4,13 +4,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:app_settings/app_settings.dart';
 
 import 'package:toptier/Games.dart';
 import 'package:toptier/charactertierlistpage.dart';
 import 'WebClient.dart';
 import 'GameInfo.dart';
 import 'favorites.dart';
-import 'package:uuid/uuid.dart';
+import 'settingspage.dart';
+import 'userpreferences.dart';
 
 class TopTierGames extends StatelessWidget {
   const TopTierGames({super.key});
@@ -23,16 +25,18 @@ class TopTierGames extends StatelessWidget {
         primaryColor: Colors.pink.shade100,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const TopTierGamesPage(),
+      home: TopTierGamesPage(),
     );
   }
 }
 
 class TopTierGamesPage extends StatefulWidget {
+
   const TopTierGamesPage({super.key});
 
   @override
-  State<TopTierGamesPage> createState() => TopTierGamesPageState();
+  State<TopTierGamesPage> createState() =>
+      TopTierGamesPageState();
 }
 
 class TopTierGamesPageState extends State<TopTierGamesPage> {
@@ -49,6 +53,7 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
     Colors.pink.shade300,
     Colors.pink
   ];
+
 
   @override
   initState() {
@@ -112,6 +117,14 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
     }
   }
 
+  // void updateCollection(gameName, i) {
+  //   db.collection(gameName).doc((i + 1).toString()).update({
+  //     'isFavorite': FieldValue.delete(),
+  //     'canAdd': FieldValue.delete(),
+  //     'isOwned': FieldValue.delete(),
+  //   });
+  // }
+
   //set the collection information for the characters
   setCollection(gameInfo) async {
     int i = 0;
@@ -120,7 +133,7 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
       bool exists = await searchCollection(
           gameInfo.characters[i]['name'], gameInfo.gameName);
 
-      //updateIDS(gameInfo);
+      //updateCollection(gameInfo.gameName, i);
 
       if (!exists) {
         db.collection(gameInfo.gameName).doc((i + 1).toString()).set({
@@ -138,9 +151,6 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
           'description': gameInfo.characters[i]['description'],
           'stats': gameInfo.characters[i]['stats'],
           'link': gameInfo.characters[i]['link'],
-          'isFavorite': gameInfo.characters[i]['isFavorite'] ?? false,
-          'canAdd': gameInfo.characters[i]['canAdd'] ?? true,
-          'isOwned': gameInfo.characters[i]['isOwned'] ?? false,
         });
       } else {
         var docRef = db.collection(gameInfo.gameName).doc((i + 1).toString());
@@ -199,24 +209,26 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
     final gameData = gameDoc.docs.map((doc) => doc.data()).toList();
     gameData
         .map((data) => gameInfo.add(GameInfo(
-            id: data['id'],
-            name: data['name'],
-            title: data['title'],
-            image: data['image'],
-            characterClass: data['class'],
-            element: data['element'],
-            horoscope: data['horoscope'],
-            rarity: data['rarity'],
-            rating: data['rating'],
-            artifact: data['artifact'],
-            sets: data['sets'],
-            description: data['description'],
-            stats: data['stats'],
-            link: data['link'],
-            isFavorite: data['isFavorite'],
-            canAdd: data['canAdd'],
-            isOwned: data['isOwned'])))
+              id: data['id'],
+              name: data['name'],
+              title: data['title'],
+              image: data['image'],
+              characterClass: data['class'],
+              element: data['element'],
+              horoscope: data['horoscope'],
+              rarity: data['rarity'],
+              rating: data['rating'],
+              artifact: data['artifact'],
+              sets: data['sets'],
+              description: data['description'],
+              stats: data['stats'],
+              link: data['link'],
+              isFavorite: false,
+              canAdd: true,
+              isOwned: false
+            )))
         .toList();
+
     addToGames(gameInfo, data.gameName, data.creator);
     gameInfo = [];
     print("Games: ${games.length}");
@@ -298,7 +310,7 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
               ),
               onTap: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Favorites()));
+                    MaterialPageRoute(builder: (context) => Favorites()));
               },
               selected: false,
               selectedColor: Colors.pink.shade50,
@@ -318,7 +330,52 @@ class TopTierGamesPageState extends State<TopTierGamesPage> {
             style: TextStyle(fontSize: 30, fontFamily: 'Horizon'),
           ),
           actions: <Widget>[
-            IconButton(onPressed: () {}, icon: const Icon(Icons.settings)),
+            IconButton(
+              icon: const Icon(Icons.more_vert_sharp),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context, // You need to pass the BuildContext
+                  builder: (BuildContext context) {
+                    return Container(
+                      height: 200, // Set the height of the bottom sheet
+                      color:
+                          Colors.white, // Background color of the bottom sheet
+                      child: ListView(
+                        children: [
+                          ListTile(
+                            leading:
+                                const Icon(Icons.settings), // Example list tile
+                            title: const Text('Settings'),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SettingsPage(),
+                                ),
+                              ); // Close the bottom sheet
+                            },
+                          ),
+                          ListTile(
+                            leading:
+                                const Icon(Icons.logout), // Example list tile
+                            title: const Text('Log Out'),
+                            onTap: () {
+                              // Handle the tap
+                              Navigator.pop(context); // Close the bottom sheet
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            IconButton(
+                icon: const Icon(Icons.info),
+                onPressed: () {
+                  AppSettings.openAppSettings();
+                }),
           ],
           backgroundColor: Colors.pink.shade100),
       body: Column(

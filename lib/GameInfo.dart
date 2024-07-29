@@ -81,4 +81,24 @@ class GameInfo {
     stats = json['stats'];
     isFavorite = json['isFavorite'];
   }
+
+  factory GameInfo.fromJson2(Map<String, dynamic> json) => GameInfo(
+        id: json['id'],
+        name: json['name'],
+        title: json['title'],
+        image: json['image'],
+        characterClass: json['class'],
+        element: json['element'],
+        horoscope: json['horoscope'],
+        rarity: json['rarity'],
+        rating: json['rating'],
+        artifact: json['artifact'],
+        sets: json['sets'],
+        description: json['description'],
+        link: json['link'],
+        stats: json['stats'],
+        isFavorite: json['isFavorite'],
+        canAdd: json['canAdd'],
+        isOwned: json['isOwned'],
+      );
 }

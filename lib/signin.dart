@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toptier/gamelistpage.dart';
-import 'createaccount.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+
+import 'CharacterRemove.dart';
+import 'favoritesprovider.dart';
+import 'userpreferences.dart';
+import 'createaccount.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -36,6 +40,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormFieldState<String>> _email = GlobalKey();
   final GlobalKey<FormFieldState<String>> _pass = GlobalKey();
+
+  late final provider;
+  late final user;
+  late final sharedPrefs;
+
   List<Color> colorings = [
     Colors.white,
     Colors.pink.shade50,
@@ -49,6 +58,20 @@ class _LoginPageState extends State<LoginPage> {
     fontSize: 60.0,
     fontFamily: 'Horizon',
   );
+
+  bool _isInitialized = false; // Define the flag here
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      provider = Provider.of<FavoriteProvider>(context);
+      user = Provider.of<FirebaseAuth>(context);
+      sharedPrefs = Provider.of<UserPreferences>(context);
+      loadFavorites();
+      _isInitialized = true;
+    }
+  }
 
   //validates the user input to make sure it's not null
   submit() {
@@ -68,7 +91,19 @@ class _LoginPageState extends State<LoginPage> {
         'Password': _pass.currentState?.value,
       };
 
-  //login function that checks if the user is in the database
+  loadFavorites() async {
+    String userID = user.currentUser!.uid;
+    List<CharacterRemove>? loadedFavorites =
+        await sharedPrefs.getUserFavorites(userID, 'favorites');
+    if (loadedFavorites != null) {
+      setState(() {
+        provider.favorites = loadedFavorites;
+      });
+    } else {
+      provider.favorites = [];
+    }
+  }
+
   Future<bool?> login() async {
     //the auth and db variables are used to access the firebase authentication and firestore
     final auth = Provider.of<FirebaseAuth>(context, listen: false);
@@ -140,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.red,
       ));
     } catch (e) {
-      //print('here: ${e.toString()}');
+      print('here: ${e.toString()}');
     }
     return null;
   }
@@ -236,11 +271,11 @@ class _LoginPageState extends State<LoginPage> {
                         if (submit() && await login.call() == true) {
                           if (mounted) {
                             //this will take the user to the option page
+
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        const TopTierGames()));
+                                    builder: (context) => TopTierGames()));
                           }
                         }
                       },

@@ -1,5 +1,7 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:favorite_button/favorite_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +9,8 @@ import 'GameInfo.dart';
 import 'characterprofile.dart';
 import 'favoritesprovider.dart';
 import 'CharacterRemove.dart';
+import 'settingspage.dart';
+import 'userpreferences.dart';
 
 ///Widget that shows the list of CharacterTierList Tierlists
 class CharacterTierList extends StatelessWidget {
@@ -14,7 +18,7 @@ class CharacterTierList extends StatelessWidget {
   final String creator;
   final List<GameInfo> gameInfo;
 
-  CharacterTierList({
+  const CharacterTierList({
     super.key,
     required this.gameName,
     required this.creator,
@@ -38,7 +42,51 @@ class CharacterTierList extends StatelessWidget {
           },
         ),
         actions: <Widget>[
-          IconButton(onPressed: () {}, icon: const Icon(Icons.settings)),
+          IconButton(
+            icon: const Icon(Icons.more_vert_sharp),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context, // You need to pass the BuildContext
+                builder: (BuildContext context) {
+                  return Container(
+                    height: 200, // Set the height of the bottom sheet
+                    color: Colors.white, // Background color of the bottom sheet
+                    child: ListView(
+                      children: [
+                        ListTile(
+                          leading:
+                              const Icon(Icons.settings), // Example list tile
+                          title: const Text('Settings'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SettingsPage(),
+                              ),
+                            ); // Close the bottom sheet
+                          },
+                        ),
+                        ListTile(
+                          leading:
+                              const Icon(Icons.logout), // Example list tile
+                          title: const Text('Log Out'),
+                          onTap: () {
+                            // Handle the tap
+                            Navigator.pop(context); // Close the bottom sheet
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          IconButton(
+              icon: const Icon(Icons.info),
+              onPressed: () {
+                AppSettings.openAppSettings();
+              }),
         ],
       ),
       body: SafeArea(
@@ -75,17 +123,51 @@ class CharacterTierListPage extends StatefulWidget {
 class _CharacterTierListPageState extends State<CharacterTierListPage> {
   String gameName;
   String creator;
-  var db;
   final List<GameInfo> gameInfo;
   late List<GameInfo> gInfo = gameInfo;
   final characterSearch = TextEditingController();
   late CharacterRemove characterInfo;
+  late final provider;
+  late final user;
+  late final sharedPrefs;
+  late final db;
+  bool _isInitialized = false; // Define the flag here
 
   _CharacterTierListPageState({
     required this.gameName,
     required this.creator,
     required this.gameInfo,
   });
+
+  @override
+  void initState() {
+    super.initState();
+    // Other initialization code if needed
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      provider = Provider.of<FavoriteProvider>(context);
+      user = Provider.of<FirebaseAuth>(context);
+      sharedPrefs = Provider.of<UserPreferences>(context);
+      db = Provider.of<FirebaseFirestore>(context);
+      updateTierPageFavs();
+      _isInitialized = true;
+    }
+  }
+
+  updateTierPageFavs() {
+    final List<CharacterRemove> favorites = provider.favorites;
+    gameInfo.forEach((character) {
+      final bool isFavorite =
+          favorites.any((fav) => fav.character.id == character.id);
+      character.isFavorite = isFavorite;
+      character.canAdd = !isFavorite;
+    });
+    setState(() => gInfo = gameInfo);
+  }
 
   /// Documentation for searchGame
   /// > * _`@param: [String]`_ - query
@@ -104,8 +186,8 @@ class _CharacterTierListPageState extends State<CharacterTierListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<FavoriteProvider>(context, listen: true);
-    db = Provider.of<FirebaseFirestore>(context, listen: false);
+    print(
+        'Favorites List from CharacterTierListPage: ${provider.favorites.length}');
 
     return Column(children: [
       SizedBox(
@@ -176,11 +258,8 @@ class _CharacterTierListPageState extends State<CharacterTierListPage> {
                 } else {
                   provider.removeFav(character.id);
                 }
-
-                db.collection(gameName).doc((index + 1).toString()).update({
-                  'isFavorite': character.isFavorite,
-                  'canAdd': character.canAdd,
-                });
+                sharedPrefs.saveUserFavorites(
+                    user.currentUser!.uid, 'favorites', provider.favorites);
               },
             ),
             onTap: () {
