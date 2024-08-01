@@ -10,12 +10,12 @@ This app is never meant to go into production this is simply for practice of cre
 ## Installation
 
 1. Download the repository
-   'https://github.com/Court247/TopTier2.git'
-2. Look in the .yaml file to see where the ".env" file is stored, once you do that. Create your own .env file .
-3. You would need the data information for the toptier firestore repository which can only come from me.
-4. If approved, once you you do that add the variables that MATCH in the variables given in the main.dart in this format.
-   ' VARIABLE=VALUE'
-5. Once complete, the code should run as it should connected into the firestore app.
+   `https://github.com/Court247/TopTier2.git`
+3. Look in the .yaml file to see where the ".env" file is stored, once you do that. Create your own .env file .
+4. You would need the data information for the toptier firestore repository which can only come from me.
+5. If approved, once you you do that add the variables that MATCH in the variables given in the main.dart in this format.
+   `VARIABLE=VALUE`
+7. Once complete, the code should run as it should connected into the firestore app.
 
 ## Technologies Used
 
