@@ -2,17 +2,24 @@
 
 ![Static Badge](https://img.shields.io/badge/v-1.0.17-hotpink?style=flat-square&labelColor=pink)
 
-
 ## Introduction
 
 TopTier is an app that allows users to see tierlists from select people to know what gear for a specific game to use for their character, to let them know the tier of the character they have, and other various information for the character. The data used is received from various users from accross the internet. As of right now only data from "Epic7x" and "Gachax" is being used.
-This app is never meant to go into production this is simply for practice of creating application, project management, dart and flutter languages. Dart is used for the backend and Flutter/Dart is used for the frontend.
+This app is never meant to go into production this is simply for practice of creating application, project management, dart and flutter languages. Dart is used for the backend and Flutter is used for the frontend.
 
 ## Installation
 
-## Usage
+1. Download the repository
+   'https://github.com/Court247/TopTier2.git'
+2. Look in the .yaml file to see where the ".env" file is stored, once you do that. Create your own .env file .
+3. You would need the data information for the toptier firestore repository which can only come from me.
+4. If approved, once you you do that add the variables that MATCH in the variables given in the main.dart in this format.
+   ' VARIABLE=VALUE'
+5. Once complete, the code should run as it should connected into the firestore app.
 
 ## Technologies Used
+
+Emulator is needed
 
 ## License
 
