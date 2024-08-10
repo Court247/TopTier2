@@ -23,7 +23,22 @@ Emulator is needed
 
 ## License
 
+Nothing Can be added or done without my expressed permission since it requires adding and removing information from Firestore databases. 
+
 ## Contact Information
+
+Contact: courtney.woodsjobs@gmail.com for job inquiries. 
+
+Contact here for access permissions
+
+##Images
+
+![Screenshot_1723331953](https://github.com/user-attachments/assets/ede20d23-9ab4-4e87-ba4c-5d427e208f97)
+![Screenshot_1723331974](https://github.com/user-attachments/assets/e013f100-07d6-4cfc-821b-a491e8e4330d)
+![Screenshot_1723331980](https://github.com/user-attachments/assets/554f46fa-1ab7-41f4-b166-fe76fe1d6e67)
+![Screenshot_1723332001](https://github.com/user-attachments/assets/ab88d610-0e06-4830-833e-062dee88f0b0)
+![Screenshot_1723331984](https://github.com/user-attachments/assets/86427d46-4237-4c14-a3ef-0390dfa671bf)
+![Screenshot_1723331993](https://github.com/user-attachments/assets/cadb107e-8a8e-422d-b7d3-d351fefae00e)
 
 ## Change Log
 
