@@ -40,12 +40,10 @@ class UserPreferences {
     List<CharacterRemove> favorites = [];
     var specialString = getSpecialUserKey(userId, key);
     String? jsonString = await _prefs.getString(specialString);
-    if (jsonString != null) {
-      var jsonResponse = jsonDecode(jsonString) as List;
-      favorites =
-          jsonResponse.map((json) => CharacterRemove.fromJson(json)).toList();
-    }
-    return favorites;
+    var jsonResponse = jsonDecode(jsonString) as List;
+    favorites =
+        jsonResponse.map((json) => CharacterRemove.fromJson(json)).toList();
+      return favorites;
   }
 
   String getSpecialUserKey(String userId, String key) {

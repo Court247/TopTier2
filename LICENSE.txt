@@ -1,0 +1,28 @@
+LICENSE.txt
+
+All Rights Reserved © 2025 Courtney Woods
+
+This software and its source code (the "Software") are the sole and exclusive property of Courtney Woods. All rights not expressly granted by this license are hereby reserved.
+
+The Software is intended exclusively for use within the context of ArtBook, a social media app for artists. 
+
+The following restrictions apply to any and all use of the Software:
+
+    1. No AI Training: The Software, including its source code, may not be used for training, fine-tuning, or any other form of artificial intelligence or machine learning model.
+
+    2. No Redistribution or Sale: The Software may not be sold, leased, or otherwise distributed to any third party.
+
+    3. No Commercial Use Without Permission: The Software may not be used for any commercial or revenue-generating activity unless expressly authorized by Courtney Woods in writing.
+
+    4. No Derivative Works Without Permission: The Software may not be modified, adapted, or used to create derivative works unless expressly authorized by Courtney Woods in writing.
+
+    5. No Use Outside the Context of ArtBook : The Software may only be used in relation to ArtBook and its intended purpose as a social media app for artists.
+
+By using the Software, you acknowledge and agree to abide by these terms. Unauthorized use is strictly prohibited and may be subject to legal action.
+
+For permission requests or further inquiries, contact courtney.woodsjobs@gmail.com.
+
+Courtney Woods reserves the right to modify this license at any time.
+
+
+

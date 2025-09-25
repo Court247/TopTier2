@@ -12,7 +12,6 @@ import 'WebClient.dart';
 import 'GameInfo.dart';
 import 'favorites.dart';
 import 'settingspage.dart';
-import 'userpreferences.dart';
 
 class TopTierGames extends StatelessWidget {
   const TopTierGames({super.key});
