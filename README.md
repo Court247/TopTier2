@@ -152,14 +152,15 @@ flutter pub upgrade
 ---
 
 ## 🖼 Screenshots
-| UI Samples |
-|------------|
-| ![1](https://github.com/user-attachments/assets/ede20d23-9ab4-4e87-ba4c-5d427e208f97) |
-| ![2](https://github.com/user-attachments/assets/e013f100-07d6-4cfc-821b-a491e8e4330d) |
-| ![3](https://github.com/user-attachments/assets/554f46fa-1ab7-41f4-b166-fe76fe1d6e67) |
-| ![4](https://github.com/user-attachments/assets/ab88d610-0e06-4830-833e-062dee88f0b0) |
-| ![5](https://github.com/user-attachments/assets/86427d46-4237-4c14-a3ef-0390dfa671bf) |
-| ![6](https://github.com/user-attachments/assets/cadb107e-8a8e-422d-b7d3-d351fefae00e) |
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ede20d23-9ab4-4e87-ba4c-5d427e208f97" width="300" height="533" alt="1" />
+  <img src="https://github.com/user-attachments/assets/e013f100-07d6-4cfc-821b-a491e8e4330d" width="300" height="533" alt="2" />
+  <img src="https://github.com/user-attachments/assets/554f46fa-1ab7-41f4-b166-fe76fe1d6e67" width="300" height="533" alt="3" />
+  <img src="https://github.com/user-attachments/assets/ab88d610-0e06-4830-833e-062dee88f0b0" width="300" height="533" alt="4" />
+  <img src="https://github.com/user-attachments/assets/86427d46-4237-4c14-a3ef-0390dfa671bf" width="300" height="533" alt="5" />
+  <img src="https://github.com/user-attachments/assets/cadb107e-8a8e-422d-b7d3-d351fefae00e" width="300" height="533" alt="6" />
+</p>
 
 ---
 
